@@ -48,4 +48,4 @@ create-gke-es-sa:
 	@gcloud iam service-accounts keys create external-secrets-sa.json --iam-account=external-secrets-sa@$(GCP_PROJECT).iam.gserviceaccount.com
 
 delete-gke-clusters:
-	@gcloud container clusters delete k8s-native-java-ai --region=$(GCP_REGION) --async --quiet
+	@gcloud container clusters delete k8s-native-ai-platform --region=$(GCP_REGION) --async --quiet
