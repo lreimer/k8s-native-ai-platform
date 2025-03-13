@@ -1,0 +1,32 @@
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flowise
+  namespace: flowise
+  labels:
+    app: flowise
+spec:
+  selector:
+    matchLabels:
+      app: flowise
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: flowise
+    spec:
+      containers:
+      - name: flowise
+        image: flowiseai/flowise:2.2.1
+        imagePullPolicy: Always
+        resources: 
+          requests:
+            cpu: 250m
+            memory: 512Mi            
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+        ports:
+        - name: http
+          containerPort: 3000

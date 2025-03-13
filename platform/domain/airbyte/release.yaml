@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: airbyte
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: airbyte
+      sourceRef:
+        kind: HelmRepository
+        name: airbyte
+      version: "1.2.0"
+  interval: 1h0m0s
+  releaseName: airbyte
+  targetNamespace: airbyte
+  values:
+    global:
+      storage:
+        type: "gcs"
+        storageSecretName: airbyte-config-secrets
+        bucket:
+          log: airbyte-bucket
+          state: airbyte-bucket
+          workloadOutput: airbyte-bucket
+        gcs:
+          projectId: cloud-native-experience-lab
+          credentialsJson: airbyte.json
+          credentialsPath: /secrets/gcs-log-creds/airbyte.json
+      secretsManager:
+        type: googleSecretManager
+        secretName: airbyte-config-secrets
+        googleSecretManager:
+          projectId: cloud-native-experience-lab
+          credentialsSecretKey: airbyte.json
+    webapp:
+      service:
+        type: LoadBalancer

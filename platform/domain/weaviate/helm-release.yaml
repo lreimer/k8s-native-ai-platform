@@ -1,0 +1,66 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta2
+kind: HelmRelease
+metadata:
+  name: weaviate
+  namespace: weaviate
+spec:
+  interval: 5m
+  timeout: 10m
+  chart:
+    spec:
+      chart: weaviate
+      version: '17.3.2' # v17.3.2 uses Weaviate 1.27.5
+      sourceRef:
+        kind: HelmRepository
+        name: weaviate
+        namespace: weaviate
+  # https://github.com/weaviate/weaviate-helm/blob/master/weaviate/values.yaml
+  values:
+    service:
+      type: LoadBalancer
+
+    grpcService:
+      enabled: true
+      type: LoadBalancer
+
+    serviceMonitor:
+      enabled: true
+
+    # Weaviate Config
+    # Authentication and Authorization is disabled by default
+    authentication:
+      anonymous_access:
+        enabled: true
+
+    env:
+      # Expose metrics on port 2112 for Prometheus to scrape
+      PROMETHEUS_MONITORING_ENABLED: true
+ 
+    envSecrets:
+      OPENAI_API_KEY: openai-api-key
+      OPENAI_APIKEY: openai-api-key
+
+    modules:
+      # The text2vec-openai module uses OpenAI Embeddings API
+      # to dynamically compute vector embeddings based on the
+      # sentence's context.
+      # More information about OpenAI Embeddings API can be found here:
+      # https://beta.openai.com/docs/guides/embeddings/what-are-embeddings
+      text2vec-openai:
+        # enable if you want to use OpenAI module
+        enabled: true
+
+      # The qna-openai module uses OpenAI Completions API
+      # to dynamically answer given questions.
+      # More information about OpenAI Completions API can be found here:
+      # https://beta.openai.com/docs/api-reference/completions
+      qna-openai:
+        # enable if you want to use OpenAI module
+        enabled: true
+
+    # It is also possible to configure authentication and authorization through a
+    # custom configmap The authorization and authentication values defined in
+    # values.yaml will be ignored when defining a custom config map.
+    # custom_config_map:
+    #   enabled: false
+    #   name: openai-api-key

@@ -1,0 +1,59 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: langflow-ide
+  namespace: flux-system
+spec:
+  chart:
+    spec:
+      chart: langflow-ide
+      sourceRef:
+        kind: HelmRepository
+        name: langflow
+      version: "0.1.0"
+  interval: 1h0m0s
+  releaseName: langflow-ide
+  targetNamespace: langflow
+  values: 
+    postgresql:
+      enabled: true
+      fullnameOverride: "langflow-ide-postgresql-service"
+      auth:
+        username: "langflow"
+        password: "langflow-postgres"
+        database: "langflow-db"
+
+    ingress:
+      enabled: false
+
+    langflow:
+      backend:
+        env:
+          - name: "LANGFLOW_PORT"
+            value: "7860"
+          - name: openai_key_var
+            valueFrom:
+              secretKeyRef:
+                name: openai-api-key
+                key: OPENAI_API_KEY
+
+        externalDatabase:
+          enabled: true
+          driver:
+            value: "postgresql"
+          host:
+            value: "langflow-ide-postgresql-service"
+          port:
+            value: "5432"
+          database:
+            value: "langflow-db"
+          user:
+            value: "langflow"
+          password:
+            valueFrom:
+              secretKeyRef:
+                key: "password"
+                name: "langflow-ide-postgresql-service"
+        
+        sqlite:
+          enabled: false

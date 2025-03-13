@@ -1,0 +1,68 @@
+# https://taskfile.dev
+version: '3'
+
+dotenv: ['.env', '{{.HOME}}/.env']
+
+env:
+  REPO_NAME: k8s-native-ai-platform
+  GITHUB_USER: lreimer
+  GCP_PROJECT: data-engineering-lab-411011
+  
+vars: {}
+
+tasks:
+  default:
+    desc: If running only "task" print all available tasks
+    cmd: task --list-all
+    silent: true
+
+  brew:
+    desc: Install tool dependencies with brew
+    internal: true
+    run: once
+    platforms: [darwin, linux]
+    cmd: brew bundle --no-lock --verbose
+    status:
+      - brew bundle check --verbose
+
+  flux-bootstrap:
+    desc: Bootstrap Flux
+    silent: true
+    requires:
+      vars: [GITHUB_USER, GITHUB_TOKEN, REPO_NAME]
+    cmd: | 
+      flux bootstrap github \
+        --owner={{.GITHUB_USER}} \
+        --repository={{.REPO_NAME}} \
+        --branch=main \
+        --path=./platform/foundation \
+        --components-extra=image-reflector-controller,image-automation-controller \
+        --read-write-key \
+        --personal
+
+  flux-sync:
+    desc: Reconcile flux-system
+    silent: true
+    cmd: flux reconcile source git flux-system
+
+  flux-status:
+    desc: Show the status of the flux-system
+    silent: true
+    cmd: flux get all --all-namespaces
+
+  create-secrets:
+    desc: Create the OpenAI secret
+    silent: true
+    requires:
+      vars: [OPENAI_API_KEY]
+    cmd: kubectl create secret generic openai-api-key --from-literal=OPENAI_API_KEY={{.OPENAI_API_KEY}} --from-literal=OPENAI_APIKEY={{.OPENAI_API_KEY}}
+
+  gcp-secret:
+    desc: Create the GCP secret
+    silent: true
+    cmd: kubectl create secret generic gcp-secret -n crossplane-system --from-file=creds={{.HOME}}/.gcp/credentials.json
+
+  aws-secret:
+    desc: Create the AWS secret
+    silent: true
+    cmd: kubectl create secret generic aws-secret -n crossplane-system --from-file=creds={{.HOME}}/.aws/credentials
