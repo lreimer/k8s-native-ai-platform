@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openai-chat-service
+  namespace: default
+  labels:
+    app: openai-chat-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: openai-chat-service
+  template:
+    metadata:
+      labels:
+        app: openai-chat-service
+    spec:
+      containers:
+      - name: openai-chat-service
+        image: ghcr.io/lreimer/k8s-native-java-ai-openai-chat-service:main
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: management
+          containerPort: 9000
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        probes:
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: management
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: management
+            initialDelaySeconds: 10
+            periodSeconds: 10
+        env:
+        - name: QUARKUS_LANGCHAIN4J_OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: openai-api-key
+              key: OPENAI_API_KEY
+
+        # - name: QUARKUS_LANGCHAIN4J_OPENAI_BASE_URL
+        #   value: "http://openai-proxy-service.default.svc.cluster.local:10000"
+
+        # - name: QUARKUS_LANGCHAIN4J_OPENAI_CHAT_MODEL_MODEL_NAME
+        #   value: "llama3.1"
+        # - name: QUARKUS_LANGCHAIN4J_OPENAI_BASE_URL
+        #   value: "http://ollama-model-llama31.default.svc.cluster.local:11434"
+        
