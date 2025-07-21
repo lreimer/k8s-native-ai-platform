@@ -43,12 +43,11 @@ kollama deploy llama3.1
 kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type=LoadBalancer
 
 # model deployment via CRD
-kubectl apply -f models/phi3.yaml
-kollama expose phi3 --service-type LoadBalancer
+kubectl apply -f models/ollama-model-llama31.yaml
+kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type LoadBalancer
 
 # to start a chat with ollama
 # exchange localhost with the actual LoadBalancer IP
-OLLAMA_HOST=localhost:11434 ollama run phi3
 OLLAMA_HOST=localhost:11434 ollama run llama3.1
 
 # call the chat API of Ollama or OpenAI
