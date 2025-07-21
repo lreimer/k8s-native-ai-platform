@@ -37,9 +37,34 @@ open http://langflow.127.0.0.1.sslip.io
 
 # the Jupyther Hub UI is accessible via Ingress
 open http://jupyther.127.0.0.1.sslip.io 
+
+# model deployment using CLI
+kollama deploy llama3.1
+kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type=LoadBalancer
+
+# model deployment via CRD
+kubectl apply -f models/phi3.yaml
+kollama expose phi3 --service-type LoadBalancer
+
+# to start a chat with ollama
+# exchange localhost with the actual LoadBalancer IP
+OLLAMA_HOST=localhost:11434 ollama run phi3
+OLLAMA_HOST=localhost:11434 ollama run llama3.1
+
+# call the chat API of Ollama or OpenAI
+# curl http://localhost:11434/v1/chat/completions
+curl http://localhost:11434/api/chat  \
+  -H "Content-Type: application/json"  \
+  -d '{
+    "model": "llama3.1",
+    "messages": [
+      {
+        "role": "user",
+        "content": "Say this is a test!"
+      }
+    ]
+  }'
 ```
-
-
 
 ## Maintainer
 
