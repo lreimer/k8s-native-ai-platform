@@ -18,7 +18,7 @@ kubectl annotate namespace default cnrm.cloud.google.com/project-id=data-enginee
 
 # install required dependencies via Brewfile
 brew bundle
-task create-secret
+task create-secrets
 
 # the Kube Prometheus Stack is accessiable via Ingress
 open http://grafana.127.0.0.1.sslip.io
