@@ -1,0 +1,10 @@
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: zenml
+  namespace: zenml
+spec:
+  interval: 5m0s
+  url: oci://public.ecr.aws/zenml/zenml
+  ref:
+    tag: '0.84.1' # Use the latest stable version of ZenML

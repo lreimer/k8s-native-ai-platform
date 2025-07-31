@@ -1,0 +1,12 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zenml
+  namespace: zenml
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: zenml
+  interval: 5m
+  timeout: 10m
+  
