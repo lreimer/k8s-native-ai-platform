@@ -20,24 +20,6 @@ kubectl annotate namespace default cnrm.cloud.google.com/project-id=data-enginee
 brew bundle
 task create-secrets
 
-# the Kube Prometheus Stack is accessiable via Ingress
-open http://grafana.127.0.0.1.sslip.io
-
-# to test the OpenAI proxy, issue the following curl command
-curl http://openai.127.0.0.1.sslip.io/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-     "model": "gpt-4o-mini",
-     "messages": [{"role": "user", "content": "Say this is a test!"}],
-     "temperature": 0.7
-   }'
-
-# the Langflow UI is accessible via Ingress
-open http://langflow.127.0.0.1.sslip.io 
-
-# the Jupyther Hub UI is accessible via Ingress
-open http://jupyther.127.0.0.1.sslip.io 
-
 # model deployment using CLI
 kollama deploy llama3.1
 kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type=LoadBalancer
