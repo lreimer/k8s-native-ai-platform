@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ollama-chat-service
+  namespace: default
+  labels:
+    app: ollama-chat-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ollama-chat-service
+  template:
+    metadata:
+      labels:
+        app: ollama-chat-service
+    spec:
+      containers:
+      - name: ollama-chat-service
+        image: ghcr.io/lreimer/k8s-native-java-ai-ollama-chat-service:main
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 8080
+        - name: management
+          containerPort: 9000
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        probes:
+          readinessProbe:
+            httpGet:
+              path: /q/health/ready
+              port: management
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /q/health/live
+              port: management
+            initialDelaySeconds: 10
+            periodSeconds: 10
+        env:
+        - name: QUARKUS_LANGCHAIN4J_OLLAMA_BASE_URL
+          value: "http://ollama-model-llama31.default.svc.cluster.local:11434"

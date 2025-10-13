@@ -4,3 +4,4 @@ resources:
   # - kyverno/
   - openai-chat-service/
   - openai-proxy/
+  - ollama-chat-service/
