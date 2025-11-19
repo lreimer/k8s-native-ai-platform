@@ -19,7 +19,11 @@ kubectl annotate namespace default cnrm.cloud.google.com/project-id=data-enginee
 # install required dependencies via Brewfile
 brew bundle
 task create-secrets
+```
 
+## Usage
+
+```bash
 # model deployment using CLI
 kollama deploy llama3.1
 kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type=LoadBalancer
@@ -31,20 +35,31 @@ kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type Lo
 
 # to start a chat with ollama
 # exchange localhost with the actual LoadBalancer IP
-OLLAMA_HOST=localhost:11434 ollama run llama3.1
+export OLLAMA_HOST=$(kubectl get service ollama-model-llama31-lb -o jsonpath='{.status.loadBalancer.ingress[0].ip}'):11434
+ollama run llama3.1
 
 # call the chat API of Ollama or OpenAI
-# curl http://localhost:11434/v1/chat/completions
-curl http://localhost:11434/api/chat  \
+# curl http://$OLLAMA_HOST/api/chat
+curl http://$OLLAMA_HOST/v1/chat/completions  \
   -H "Content-Type: application/json"  \
   -d '{
     "model": "llama3.1",
     "messages": [
       {
         "role": "user",
-        "content": "Say this is a test!"
+        "content": "Say hi to the Continuous Lifecycle conference!"
       }
     ]
+  }'
+
+# call OpenAI proxy gateway
+export OPENAI_PROXY_HOST=$(kubectl get service openai-proxy-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+curl http://$OPENAI_PROXY_HOST/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o-mini",
+    "messages": [{"role": "user", "content": "Say hi to the Continuous Lifecycle conference!"}],
+    "temperature": 0.7
   }'
 ```
 
