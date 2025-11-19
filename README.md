@@ -26,6 +26,7 @@ kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type=Lo
 
 # model deployment via CRD
 kubectl apply -f models/ollama-model-llama31.yaml
+kollama expose llama3.1 --service-name=ollama-model-llama31
 kollama expose llama3.1 --service-name=ollama-model-llama31-lb --service-type LoadBalancer
 
 # to start a chat with ollama

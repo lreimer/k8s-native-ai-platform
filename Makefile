@@ -8,12 +8,12 @@ GITHUB_USER ?= lreimer
 create-gke-cluster:
 	@gcloud container clusters create k8s-native-ai-platform \
 		--release-channel=regular \
-		--cluster-version=1.30 \
+		--cluster-version=1.33 \
 		--region=$(GCP_REGION) \
 		--addons HttpLoadBalancing,HorizontalPodAutoscaling,ConfigConnector \
 		--workload-pool=$(GCP_PROJECT).svc.id.goog \
 		--num-nodes=1 \
-		--min-nodes=1 --max-nodes=7 \
+		--min-nodes=1 --max-nodes=5 \
 		--enable-autoscaling \
 		--autoscaling-profile=optimize-utilization \
 		--enable-vertical-pod-autoscaling \
@@ -31,7 +31,6 @@ bootstrap-flux2:
 		--repository=k8s-native-ai-platform \
 		--branch=main \
 		--path=./platform/foundation \
-		--components-extra=image-reflector-controller,image-automation-controller \
 		--read-write-key \
 		--personal
 
